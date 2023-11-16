@@ -11,16 +11,10 @@ def print_menu_direcionado():
 def print_menu_app():
     print('''
             1. Inserir elementos [VERTICES/ARESTAS]
-            2. ----------------
-            3. Exibir grafo
-            4. Informacoes do grafo
+            2. Informações dos vértices
+            3. Informacoes do grafo
+            4. Exibir grafo
             0. Sair
-        ''')
-    
-def print_menu_inserir_elementos():
-    print('''
-            1. Inserir vertice
-            2. Inserir aresta
         ''')
     
 def print_menu_modo_insercao():
@@ -28,11 +22,24 @@ def print_menu_modo_insercao():
             1. Inserir um a um
             2. Inserir em lote
         ''')
+    
+def print_menu_inserir_elementos():
+    print('''
+            1. Inserir vertice
+            2. Inserir aresta
+        ''')
 
 def print_menu_valorado():
     print('''
             1. Aresta Valorada
             2. Aresta Nao valorada
+        ''')
+
+def print_menu_info_vertices():
+    print('''
+            1. Vértices adjacentes de um vértice
+            2. Grau de um vértice
+            3. Verificar se dois vértices são adjacentes
         ''')
     
 def isDirecionado(direcionado):
@@ -121,11 +128,44 @@ def inserir_em_lote(G, modo_valorado, arquivo):
     except Exception as e:
         print("Ocorreu um erro durante a leitura do arquivo:", e)
 
-# def sao_adjacentes(grafo, vertice1, vertice2):
-#     return grafo.has_edge(vertice1, vertice2)
+def obter_adjacentes(G, vertice):
+    try:
+        adjacentes = list(G.neighbors(vertice))
+        print(f"Vértices adjacentes de {vertice}: {', '.join(adjacentes)}")
+
+        if isinstance(G, nx.DiGraph):  # Se o grafo for direcionado
+            adjacentes_entrada = list(G.predecessors(vertice))
+            adjacentes_saida = list(G.successors(vertice))
+            print(f"Vértices adjacentes de entrada para {vertice}: {', '.join(adjacentes_entrada)}")
+            print(f"Vértices adjacentes de saída de {vertice}: {', '.join(adjacentes_saida)}")
+    except nx.NetworkXError:
+        print(f"O vértice {vertice} não existe no grafo.")
+
+def obter_grau(G, vertice):
+    try:
+        grau = G.degree(vertice)
+        print(f"Grau do vértice {vertice}: {grau}")
+
+        if isinstance(G, nx.DiGraph):  # Se o grafo for direcionado
+            grau_entrada = G.in_degree(vertice)
+            grau_saida = G.out_degree(vertice)
+            print(f"Grau de entrada do vértice {vertice}: {grau_entrada}")
+            print(f"Grau de saída do vértice {vertice}: {grau_saida}")
+    except nx.NetworkXError:
+        print(f"O vértice {vertice} não existe no grafo.")
+
+def sao_adjacentes(G, vertice1, vertice2):
+    try:
+        adjacentes = G.has_edge(vertice1, vertice2)
+        if adjacentes:
+            print(f"Os vértices {vertice1} e {vertice2} são adjacentes.")
+        else:
+            print(f"Os vértices {vertice1} e {vertice2} não são adjacentes.")
+    except nx.NetworkXError:
+        print(f"Um dos vértices ({vertice1}, {vertice2}) não existe no grafo.")
 
 menus = {'isDirecionado' : print_menu_direcionado, 'menu_principal' : print_menu_app, 'inserir_elemento' : print_menu_inserir_elementos,
-        'modo_insercao' : print_menu_modo_insercao, 'isValorado' : print_menu_valorado}
+        'modo_insercao' : print_menu_modo_insercao, 'isValorado' : print_menu_valorado, 'info_vertice' : print_menu_info_vertices}
 
 if __name__ == "__main__":
     menus["isDirecionado"]()
@@ -169,21 +209,35 @@ if __name__ == "__main__":
                 inserir_em_lote(G, modo_valorado, arquivo)
 
         if(opcao == 2):
-            continue
+            menus["info_vertice"]()
+            opcao_info_vertices = int(input("Opcao: "))
+
+            if opcao_info_vertices == 1:
+                vertice_consulta = input("Digite o vértice para obter os vértices adjacentes: ")
+                obter_adjacentes(G, vertice_consulta)
+
+            if opcao_info_vertices == 2:
+                vertice_consulta = input("Digite o vértice para obter o grau: ")
+                obter_grau(G, vertice_consulta)
+
+            if opcao_info_vertices == 3:
+                vertice1 = input("Digite o primeiro vértice: ")
+                vertice2 = input("Digite o segundo vértice: ")
+                sao_adjacentes(G, vertice1, vertice2)
 
         if(opcao == 3):
-            nx.draw(G, with_labels=True)
-            pos = nx.spring_layout(G)
-            labels = nx.get_edge_attributes(G, 'weight')
-            nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-            plt.show()
-
-        if(opcao == 4):
             ordem = G.order()
             print("Ordem do Grafo:", ordem)
 
             tamanho = G.size()
             print("Tamanho do Grafo:", tamanho)
 
+        if(opcao == 4):
+            nx.draw(G, with_labels=True)
+            pos = nx.spring_layout(G)
+            labels = nx.get_edge_attributes(G, 'weight')
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+            plt.show()
+            
     print(G.nodes)
     print(G.edges)
