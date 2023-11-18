@@ -14,6 +14,7 @@ def print_menu_app():
             2. Informações dos vértices
             3. Informacoes do grafo
             4. Exibir grafo
+            5. Menor custo
             0. Sair
         ''')
     
@@ -80,7 +81,7 @@ def inserir_aresta_valorada(G):
     while True:
         aresta1 = input("Digite o vertice inicial: ")    
         aresta2 = input("Digite o vertice final: ")
-        peso = input("Digite o peso: ")
+        peso = int(input("Digite o peso: "))
 
         weighted_edges = [(aresta1, aresta2, peso)]
         G.add_weighted_edges_from(weighted_edges)
@@ -164,6 +165,17 @@ def sao_adjacentes(G, vertice1, vertice2):
     except nx.NetworkXError:
         print(f"Um dos vértices ({vertice1}, {vertice2}) não existe no grafo.")
 
+
+def calcular_caminho_mais_curto(G, vertice_origem, vertice_destino):
+    try:
+        caminho, custo = nx.single_source_dijkstra(G, vertice_origem, target=vertice_destino)
+        print(f"Caminho mais curto entre {vertice_origem} e {vertice_destino}: {caminho}")
+        print(f"Custo do menor caminho: {custo}")
+    except nx.NetworkXNoPath:
+        print(f"Não há caminho entre {vertice_origem} e {vertice_destino}.")
+    except nx.NodeNotFound:
+        print(f"Pelo menos um dos vértices ({vertice_origem}, {vertice_destino}) não existe no grafo.")
+
 menus = {'isDirecionado' : print_menu_direcionado, 'menu_principal' : print_menu_app, 'inserir_elemento' : print_menu_inserir_elementos,
         'modo_insercao' : print_menu_modo_insercao, 'isValorado' : print_menu_valorado, 'info_vertice' : print_menu_info_vertices}
 
@@ -238,6 +250,11 @@ if __name__ == "__main__":
             labels = nx.get_edge_attributes(G, 'weight')
             nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
             plt.show()
-            
+        
+        if(opcao == 5):
+            origem = input("Digite o vértice de origem: ")
+            destino = input("Digite o vértice de destino: ")
+            calcular_caminho_mais_curto(G, origem, destino)
+
     print(G.nodes)
     print(G.edges)
