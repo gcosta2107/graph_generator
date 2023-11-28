@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import csv  
 
 def print_menu_direcionado():
     print('''
@@ -15,6 +16,7 @@ def print_menu_app():
             3. Informacoes do grafo
             4. Exibir grafo
             5. Menor custo
+            6. Diametro
             0. Sair
         ''')
     
@@ -104,30 +106,31 @@ def inserir_elemento(G, opcao_1a1, modo_valorado):
         if modo_valorado == 2:
             inserir_aresta_nao_valorada(G)
     
-
 def inserir_em_lote(G, modo_valorado, arquivo):
     try:
         with open(arquivo, 'r') as file:
-            for line in file:
-                dados = line.strip().split()
-
-                if len(dados) < 2:
-                    print("Formato inválido na linha:", line)
+            csv_reader = csv.reader(file)
+            
+            # Ignora a primeira linha
+            next(csv_reader, None)
+            
+            for row in csv_reader:
+                if len(row) < 2:
+                    print("Formato inválido na linha:", row)
                 else:
-                    vertice1, vertice2 = dados[0], dados[1]
+                    vertice1, vertice2 = row[0], row[1]
 
-                    if len(dados) == 3:
-                        modo_valorado == 2 
-                        peso = dados[2]
+                    if len(row) == 3:
+                        modo_valorado == 2
+                        peso = row[2]
                         G.add_edge(vertice1, vertice2, weight=peso)
                     else:
                         G.add_edge(vertice1, vertice2)
 
-        print("Inserção em lote concluída.")
     except FileNotFoundError:
-        print("Arquivo não encontrado.")
+        print(f"Arquivo {arquivo} não encontrado.")
     except Exception as e:
-        print("Ocorreu um erro durante a leitura do arquivo:", e)
+        print(f"Ocorreu um erro: {e}")
 
 def obter_adjacentes(G, vertice):
     try:
@@ -175,6 +178,22 @@ def calcular_caminho_mais_curto(G, vertice_origem, vertice_destino):
         print(f"Não há caminho entre {vertice_origem} e {vertice_destino}.")
     except nx.NodeNotFound:
         print(f"Pelo menos um dos vértices ({vertice_origem}, {vertice_destino}) não existe no grafo.")
+
+
+def obter_diametro(G):
+    try:
+        excentricidades = nx.eccentricity(G)
+
+        no_mais_distante = max(excentricidades, key=excentricidades.get)
+
+        diametro = excentricidades[no_mais_distante]
+
+        print(f"O diâmetro do grafo é: {diametro}")
+        return diametro
+
+    except Exception as e:
+        print(f"Ocorreu um erro ao calcular o diâmetro: {e}")
+
 
 menus = {'isDirecionado' : print_menu_direcionado, 'menu_principal' : print_menu_app, 'inserir_elemento' : print_menu_inserir_elementos,
         'modo_insercao' : print_menu_modo_insercao, 'isValorado' : print_menu_valorado, 'info_vertice' : print_menu_info_vertices}
@@ -250,11 +269,15 @@ if __name__ == "__main__":
             labels = nx.get_edge_attributes(G, 'weight')
             nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
             plt.show()
+            
         
         if(opcao == 5):
             origem = input("Digite o vértice de origem: ")
             destino = input("Digite o vértice de destino: ")
             calcular_caminho_mais_curto(G, origem, destino)
+        
+        if(opcao == 6):
+            obter_diametro(G);
 
     print(G.nodes)
     print(G.edges)
