@@ -179,6 +179,29 @@ def calcular_caminho_mais_curto(G, vertice_origem, vertice_destino):
     except nx.NodeNotFound:
         print(f"Pelo menos um dos vértices ({vertice_origem}, {vertice_destino}) não existe no grafo.")
 
+def excentricidade_vertice(G, vertice):
+    if not G.has_node(vertice):
+        print(f"O vértice {vertice} não existe no grafo.")
+        return
+
+    has_weighted_edges = any('weight' in G[u][v] for u, v in G.edges())
+
+    excentricidades = []
+    for node in G.nodes():
+        try:
+            if has_weighted_edges:
+                excentricidade = nx.shortest_path_length(G, source=vertice, target=node, weight='weight')
+            else:
+                excentricidade = nx.shortest_path_length(G, source=vertice, target=node)
+            excentricidades.append(excentricidade)
+        except Exception as e:
+            print("")
+
+    if excentricidades:
+        max_excentricidade = max(excentricidades)
+        print(f"A excentricidade do vértice {vertice} é {max_excentricidade}")
+    else:
+        print(f"O vértice {vertice} não tem ligações no grafo.")
 
 def obter_diametro(G):
     try:
@@ -212,72 +235,79 @@ if __name__ == "__main__":
         
         menus["menu_principal"]()
 
-        opcao = int(input("Opcao: "))
+        try:
+            opcao = int(input("Opcao: "))
 
-        if(opcao == 0):
-            print("Encerrando Aplicacao....")
+            if opcao == 0:
+                print("Encerrando Aplicacao....")
 
-        if(opcao == 1):
-            menus["modo_insercao"]()
-            modo_insercao = int(input("Opcao: "))
+            if opcao == 1:
+                menus["modo_insercao"]()
+                modo_insercao = int(input("Opcao: "))
 
-            if modo_insercao == 1:
-                menus["inserir_elemento"]()
-                opcao_elemento = int(input("Opcao: "))
+                if modo_insercao == 1:
+                    menus["inserir_elemento"]()
+                    opcao_elemento = int(input("Opcao: "))
 
-                if opcao_elemento == 1:
-                    modo_valorado = 0
+                    if opcao_elemento == 1:
+                        modo_valorado = 0
 
-                if opcao_elemento == 2:
-                    menus["isValorado"]()
-                    modo_valorado = int(input("Opcao: "))
+                    if opcao_elemento == 2:
+                        menus["isValorado"]()
+                        modo_valorado = int(input("Opcao: "))
 
-                inserir_elemento(G, opcao_elemento, modo_valorado)
+                    inserir_elemento(G, opcao_elemento, modo_valorado)
 
-            if modo_insercao == 2:
-                print("ATENÇÃO!!! O ARQUIVO DEVE ESTAR NO FORMATO (VERTICE1 VERTICE2 PESO (se for o caso))")
-                arquivo = input("Digite o nome do arquivo: ")
-                inserir_em_lote(G, modo_valorado, arquivo)
+                if modo_insercao == 2:
+                    print("ATENÇÃO!!! O ARQUIVO DEVE ESTAR NO FORMATO (VERTICE1 VERTICE2 PESO (se for o caso))")
+                    arquivo = input("Digite o nome do arquivo: ")
+                    inserir_em_lote(G, modo_valorado, arquivo)
 
-        if(opcao == 2):
-            menus["info_vertice"]()
-            opcao_info_vertices = int(input("Opcao: "))
+            if (opcao == 2):
+                menus["info_vertice"]()
+                opcao_info_vertices = int(input("Opcao: "))
 
-            if opcao_info_vertices == 1:
-                vertice_consulta = input("Digite o vértice para obter os vértices adjacentes: ")
-                obter_adjacentes(G, vertice_consulta)
+                if opcao_info_vertices == 1:
+                    vertice_consulta = input("Digite o vértice para obter os vértices adjacentes: ")
+                    obter_adjacentes(G, vertice_consulta)
 
-            if opcao_info_vertices == 2:
-                vertice_consulta = input("Digite o vértice para obter o grau: ")
-                obter_grau(G, vertice_consulta)
+                if opcao_info_vertices == 2:
+                    vertice_consulta = input("Digite o vértice para obter o grau: ")
+                    obter_grau(G, vertice_consulta)
 
-            if opcao_info_vertices == 3:
-                vertice1 = input("Digite o primeiro vértice: ")
-                vertice2 = input("Digite o segundo vértice: ")
-                sao_adjacentes(G, vertice1, vertice2)
+                if opcao_info_vertices == 3:
+                    vertice1 = input("Digite o primeiro vértice: ")
+                    vertice2 = input("Digite o segundo vértice: ")
+                    sao_adjacentes(G, vertice1, vertice2)
 
-        if(opcao == 3):
-            ordem = G.order()
-            print("Ordem do Grafo:", ordem)
+            if (opcao == 3):
+                ordem = G.order()
+                print("Ordem do Grafo:", ordem)
 
-            tamanho = G.size()
-            print("Tamanho do Grafo:", tamanho)
+                tamanho = G.size()
+                print("Tamanho do Grafo:", tamanho)
 
-        if(opcao == 4):
-            nx.draw(G, with_labels=True)
-            pos = nx.spring_layout(G)
-            labels = nx.get_edge_attributes(G, 'weight')
-            nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-            plt.show()
-            
+            if (opcao == 4):
+                nx.draw(G, with_labels=True)
+                pos = nx.spring_layout(G)
+                labels = nx.get_edge_attributes(G, 'weight')
+                nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+                plt.show()
+
+            if (opcao == 5):
+                origem = input("Digite o vértice de origem: ")
+                destino = input("Digite o vértice de destino: ")
+                calcular_caminho_mais_curto(G, origem, destino)
+
+            if opcao == 6:
+                obter_diametro(G)
         
-        if(opcao == 5):
-            origem = input("Digite o vértice de origem: ")
-            destino = input("Digite o vértice de destino: ")
-            calcular_caminho_mais_curto(G, origem, destino)
+        except Exception as e:
+            print('''
+            Opção Inválida
+            Voltando ao Menu
+        ''')
         
-        if(opcao == 6):
-            obter_diametro(G);
 
     print(G.nodes)
     print(G.edges)
