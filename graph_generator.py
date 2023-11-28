@@ -111,7 +111,6 @@ def inserir_em_lote(G, modo_valorado, arquivo):
         with open(arquivo, 'r') as file:
             csv_reader = csv.reader(file)
             
-            # Ignora a primeira linha
             next(csv_reader, None)
             
             for row in csv_reader:
@@ -122,7 +121,7 @@ def inserir_em_lote(G, modo_valorado, arquivo):
 
                     if len(row) == 3:
                         modo_valorado == 2
-                        peso = row[2]
+                        peso = int(row[2])
                         G.add_edge(vertice1, vertice2, weight=peso)
                     else:
                         G.add_edge(vertice1, vertice2)
@@ -171,7 +170,7 @@ def sao_adjacentes(G, vertice1, vertice2):
 
 def calcular_caminho_mais_curto(G, vertice_origem, vertice_destino):
     try:
-        caminho, custo = nx.single_source_dijkstra(G, vertice_origem, target=vertice_destino)
+        custo, caminho = nx.single_source_dijkstra(G, vertice_origem, target=vertice_destino)
         print(f"Caminho mais curto entre {vertice_origem} e {vertice_destino}: {caminho}")
         print(f"Custo do menor caminho: {custo}")
     except nx.NetworkXNoPath:
@@ -203,25 +202,23 @@ def excentricidade_vertice(G, vertice):
     else:
         print(f"O vértice {vertice} não tem ligações no grafo.")
 
-def obter_diametro(G):
+def obter_diametro(graph, valorado):
     try:
-        excentricidades = nx.eccentricity(G)
-
-        no_mais_distante = max(excentricidades, key=excentricidades.get)
-
-        diametro = excentricidades[no_mais_distante]
-
-        print(f"O diâmetro do grafo é: {diametro}")
-        return diametro
-
-    except Exception as e:
-        print(f"Ocorreu um erro ao calcular o diâmetro: {e}")
+        if valorado:
+            diameter = nx.diameter(graph)
+        else:
+            diameter = nx.diameter(graph.to_undirected())
+        
+        print(f"Diâmetro do grafo: {diameter}")
+    except nx.NetworkXError as e:
+        print(f"Erro ao calcular o diâmetro do grafo: {e}")
 
 
 menus = {'isDirecionado' : print_menu_direcionado, 'menu_principal' : print_menu_app, 'inserir_elemento' : print_menu_inserir_elementos,
         'modo_insercao' : print_menu_modo_insercao, 'isValorado' : print_menu_valorado, 'info_vertice' : print_menu_info_vertices}
 
 if __name__ == "__main__":
+    valorado = 0
     menus["isDirecionado"]()
     modo_direcionado = int(input("Opcao: "))
 
@@ -254,6 +251,7 @@ if __name__ == "__main__":
 
                     if opcao_elemento == 2:
                         menus["isValorado"]()
+                        valorado = 1
                         modo_valorado = int(input("Opcao: "))
 
                     inserir_elemento(G, opcao_elemento, modo_valorado)
@@ -300,13 +298,10 @@ if __name__ == "__main__":
                 calcular_caminho_mais_curto(G, origem, destino)
 
             if opcao == 6:
-                obter_diametro(G)
+                obter_diametro(G, valorado)
         
         except Exception as e:
-            print('''
-            Opção Inválida
-            Voltando ao Menu
-        ''')
+            print("Ocorreu um erro!")
         
 
     print(G.nodes)

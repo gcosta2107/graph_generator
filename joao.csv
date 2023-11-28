@@ -1,0 +1,12 @@
+vertice1, vertice2, peso
+casa do joao,armazem,5
+casa do joao,pracinha,6
+casa do joao,quitanda,10
+pracinha,quitanda,3
+pracinha,cancela,6
+pracinha,banca de jornal,11
+quitanda,cancela,4
+armazem,banca de jornal,13
+banca de jornal,escola,3
+cancela,escola,8
+quitanda,banca de jornal,6
