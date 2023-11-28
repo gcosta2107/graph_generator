@@ -214,19 +214,8 @@ def diametro(g):
         atual = excentricidade_vertice(g, node)
         if atual is not None and atual > maior:
             maior = atual
+            
     print(f"O diâmetro do grafo é {maior}")
-
-def obter_diametro(graph, valorado):
-    try:
-        if valorado:
-            diameter = nx.diameter(graph)
-        else:
-            diameter = nx.diameter(graph.to_undirected())
-        
-        print(f"Diâmetro do grafo: {diameter}")
-    except nx.NetworkXError as e:
-        print(f"Erro ao calcular o diâmetro do grafo: {e}")
-
 
 menus = {'isDirecionado' : print_menu_direcionado, 'menu_principal' : print_menu_app, 'inserir_elemento' : print_menu_inserir_elementos,
         'modo_insercao' : print_menu_modo_insercao, 'isValorado' : print_menu_valorado, 'info_vertice' : print_menu_info_vertices}
