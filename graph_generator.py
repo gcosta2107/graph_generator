@@ -181,26 +181,40 @@ def calcular_caminho_mais_curto(G, vertice_origem, vertice_destino):
 def excentricidade_vertice(G, vertice):
     if not G.has_node(vertice):
         print(f"O vértice {vertice} não existe no grafo.")
-        return
+        return None
 
-    has_weighted_edges = any('weight' in G[u][v] for u, v in G.edges())
+    try:
+        has_weighted_edges = any('weight' in G[u][v] for u, v in G.edges())
 
-    excentricidades = []
-    for node in G.nodes():
-        try:
-            if has_weighted_edges:
-                excentricidade = nx.shortest_path_length(G, source=vertice, target=node, weight='weight')
-            else:
-                excentricidade = nx.shortest_path_length(G, source=vertice, target=node)
-            excentricidades.append(excentricidade)
-        except Exception as e:
-            print("")
+        excentricidades = []
+        for node in G.nodes():
+            if node != vertice:
+                try:
+                    if has_weighted_edges:
+                        excentricidade = nx.shortest_path_length(G, source=vertice, target=node, weight='weight')
+                    else:
+                        excentricidade = nx.shortest_path_length(G, source=vertice, target=node)
+                    excentricidades.append(excentricidade)
+                except nx.NetworkXNoPath:
+                    excentricidades.append(0)
 
-    if excentricidades:
-        max_excentricidade = max(excentricidades)
-        print(f"A excentricidade do vértice {vertice} é {max_excentricidade}")
-    else:
-        print(f"O vértice {vertice} não tem ligações no grafo.")
+        if excentricidades:
+            max_excentricidade = max(excentricidades)
+            return max_excentricidade
+        else:
+            print(f"O vértice {vertice} não tem ligações no grafo.")
+            return None
+    except Exception as e:
+        print(f"Erro ao calcular a excentricidade do vértice {vertice}: {e}")
+        return None
+
+def diametro(g):
+    maior = 0
+    for node in g.nodes():
+        atual = excentricidade_vertice(g, node)
+        if atual is not None and atual > maior:
+            maior = atual
+    print(f"O diâmetro do grafo é {maior}")
 
 def obter_diametro(graph, valorado):
     try:
@@ -298,7 +312,7 @@ if __name__ == "__main__":
                 calcular_caminho_mais_curto(G, origem, destino)
 
             if opcao == 6:
-                obter_diametro(G, valorado)
+                diametro(G)
         
         except Exception as e:
             print("Ocorreu um erro!")
